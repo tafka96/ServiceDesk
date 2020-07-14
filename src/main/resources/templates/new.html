@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Test From</title>
+</head>
+<body>
+<h1>Form</h1>
+<form action="#" th:action="@{/new}" th:object="${form}" method="post">
+    <p>Title: <input type="text" th:field="*{title}" /></p>
+    <p>Email: <input type="text" th:field="*{email}" /></p>
+    <p>Problem<input type="text" th:field="*{problem}" /></p>
+    <select name="priority">
+        <option th.each="priority: $T{priority).values()}" th:value="${priority}" th:text="${priority}" ></option>
+    </select>
+    <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+</form>
+</body>
+</html>
