@@ -3,6 +3,7 @@ package com.service_desk.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.service_desk.model.Ticket;
 import com.service_desk.services.TicketService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.time.LocalDate;
 import java.util.Arrays;
-
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -101,8 +101,8 @@ class TicketControllerTest {
     public void addTicketValidationTest() throws Exception {
         mockMvc.perform(post("/tickets/add").content(objectMapper.writeValueAsString(failValidationTicket)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title", is("Title must be less than 50 letters")))
-                .andExpect(jsonPath("$.email", is("Incorrect email")));
+                .andExpect(jsonPath("$.errors", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.errors", Matchers.containsInAnyOrder("Title must be between 3 and 50 letters","Please enter a correct email")));
 
         verify(ticketService, times(0)).addTicket(any(Ticket.class));
     }
@@ -111,15 +111,16 @@ class TicketControllerTest {
     public void updateTicketValidationTest() throws Exception {
         mockMvc.perform(post("/tickets/update").content(objectMapper.writeValueAsString(failValidationTicket)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title", is("Title must be less than 50 letters")))
-                .andExpect(jsonPath("$.email", is("Incorrect email")));
+                .andExpect(jsonPath("$.errors", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.errors", Matchers.containsInAnyOrder("Title must be between 3 and 50 letters","Please enter a correct email")));
+
 
         verify(ticketService, times(0)).updateTicket(any(Ticket.class));
     }
 
-    private final Ticket mockTicket1 = new Ticket(1, "Test title 1", "Testemail1@test.com", "Test problem 1", Ticket.Priority.AVERAGE,false);
-    private final Ticket mockTicket2 = new Ticket(2, "Test title 2", "Testemail2@test.com", "Test problem 2", Ticket.Priority.HIGH,false);
-    private final Ticket failValidationTicket = new Ticket(1, "Test title 1, Test title 1, Test titddddddddddle 1, Test title 1", "Testemail@testcom", "Test problem 1", Ticket.Priority.AVERAGE,false);
+    private final Ticket mockTicket1 = new Ticket(1, "Test title 1", "Testemail1@test.com", "Test problem 1", Ticket.Priority.AVERAGE,false, LocalDate.now(), null);
+    private final Ticket mockTicket2 = new Ticket(2, "Test title 2", "Testemail2@test.com", "Test problem 2", Ticket.Priority.HIGH,false, LocalDate.now(), null);
+    private final Ticket failValidationTicket = new Ticket(1, "Test title 1, Test title 1, Test titddddddddddle 1, Test title 1", "Testemail@testcom", "Test problem 1", Ticket.Priority.AVERAGE,false , LocalDate.now(), null);
     private Ticket getMockAddTicket(){
         Ticket ticket = new Ticket();
         ticket.setTitle("Test title 1");

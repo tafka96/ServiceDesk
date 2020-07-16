@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -72,6 +73,8 @@ class TicketRepositoryTest {
         ticket.setEmail("Testemail1@test.com");
         ticket.setProblem("Test problem");
         ticket.setPriority(Ticket.Priority.LOWEST);
+        ticket.setClosed(false);
+        ticket.setCreatedDate(LocalDate.now());
         return ticket;
     }
 

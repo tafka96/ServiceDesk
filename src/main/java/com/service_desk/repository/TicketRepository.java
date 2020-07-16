@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -21,15 +22,25 @@ public class TicketRepository {
 
     @Transactional
     public Ticket save(Ticket ticket){
-        ticket.setClosed(false);
+//        ticket.setClosed(false);
         entityManager.persist(ticket);
         return ticket;
+//        return ticket;
     }
     @Transactional
     public Ticket update(Ticket  ticket){
         entityManager.merge(ticket);
         return ticket;
     }
+
+    @Transactional
+    public Ticket close(Integer id){
+        Ticket ticket = entityManager.find(Ticket.class, id);
+        ticket.setClosed(true);
+        ticket.setClosedDate(LocalDate.now());
+        return entityManager.merge(ticket);
+    }
+
 
     public Ticket findById(Integer id){
         return entityManager.find(Ticket.class, id);

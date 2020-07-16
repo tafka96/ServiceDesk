@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +52,7 @@ class TicketServiceTest {
         assertSame(mockTicket1, ticketService.updateTicket(mockTicket1));
     }
 
-    private final Ticket mockTicket1 = new Ticket(1, "Test title 1", "Testemail1@test.com", "Test problem 1", Ticket.Priority.AVERAGE,false);
-    private final Ticket mockTicket2 = new Ticket(2, "Test title 2", "Testemail2@test.com", "Test problem 2", Ticket.Priority.HIGH,false);
+    private final Ticket mockTicket1 = new Ticket(1, "Test title 1", "Testemail1@test.com", "Test problem 1", Ticket.Priority.AVERAGE,false, LocalDate.now(), null);
+    private final Ticket mockTicket2 = new Ticket(2, "Test title 2", "Testemail2@test.com", "Test problem 2", Ticket.Priority.HIGH,false, LocalDate.now(), null);
 }
 

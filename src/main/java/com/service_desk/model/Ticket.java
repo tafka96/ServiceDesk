@@ -1,7 +1,9 @@
 package com.service_desk.model;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "tickets")
@@ -9,31 +11,46 @@ import javax.validation.constraints.Size;
         @NamedQuery(name = "Ticket.FindAllOpen", query = "SELECT t FROM Ticket t WHERE t.closed=false")})
 public class Ticket {
     public enum Priority{
-        HIGHEST(5), HIGH(4), AVERAGE(3), LOW(2), LOWEST(1);
-        Priority(int i) {}
-
+        LOWEST, LOW, AVERAGE,  HIGH, HIGHEST;
     }
-    @Size(max = 50, message = "Title must be less than 50 letters")
+    @Size(min= 3, max = 50, message = "Title must be between 3 and 50 letters")
+    @NotNull(message = "Title must be between 3 and 50 letters")
     private String title;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Email(regexp = ".+@.+\\..+", message = "Incorrect email")
+
+    @Email(regexp = ".+@.+\\..+", message = "Please enter a correct email")
+    @NotNull(message = "Please enter a correct email")
     private String email;
 
+    @NotNull(message = "Problem description cannot be empty")
     private String problem;
+
+    @Enumerated(EnumType.ORDINAL)
+    @NotNull(message = "Please set problem priority")
     private Priority priority;
-    @Column(name = "closed", insertable = false)
+
+    @Column(name = "closed")
     private Boolean closed;
 
-    public Ticket(Integer id, String title, String email, String problem, Priority priority, Boolean closed) {
+    @Column(name = "createdDate")
+    private LocalDate createdDate;
+
+    @Column(name = "closedDate")
+    private LocalDate closedDate;
+
+
+    public Ticket(Integer id, String title, String email, String problem, Priority priority, Boolean closed, LocalDate createdDate, LocalDate closedDate) {
         this.id = id;
         this.title = title;
         this.email = email;
         this.problem = problem;
         this.priority = priority;
         this.closed = closed;
+        this.createdDate = createdDate;
+        this.closedDate = closedDate;
     }
 
     public Ticket() {
@@ -85,6 +102,22 @@ public class Ticket {
 
     public void setPriority(Priority priority) {
         this.priority = priority;
+    }
+
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDate getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(LocalDate closedDate) {
+        this.closedDate = closedDate;
     }
 
     @Override

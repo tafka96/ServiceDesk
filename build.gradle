@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.3.1.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
+	id "com.github.node-gradle.node" version "2.2.4"
 }
 
 group = 'com.service.desk'
@@ -27,4 +28,35 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+task copyWebApp(type: Copy) {
+	from 'webapp/build'
+	into 'build/resources/main/static/.'
+}
+
+task appNpmInstall(type: NpmTask) {
+	description = "Installs all dependencies from package.json"
+	workingDir = file("${project.projectDir}/webapp")
+	args = ["install"]
+}
+task appNpmBuild(type: NpmTask) {
+	description = "Builds production version of the webapp"
+	workingDir = file("${project.projectDir}/webapp")
+	args = ["run", "build"]
+}
+
+
+appNpmBuild.dependsOn appNpmInstall
+copyWebApp.dependsOn appNpmBuild
+compileJava.dependsOn copyWebApp
+
+node {
+	download = true
+
+	// Set the work directory for unpacking node
+	workDir = file("${project.buildDir}/nodejs")
+
+	// Set the work directory for NPM
+	npmWorkDir = file("${project.buildDir}/npm")
 }
