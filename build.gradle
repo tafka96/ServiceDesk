@@ -49,7 +49,7 @@ task appNpmBuild(type: NpmTask) {
 
 appNpmBuild.dependsOn appNpmInstall
 copyWebApp.dependsOn appNpmBuild
-compileJava.dependsOn copyWebApp
+bootRun.dependsOn copyWebApp
 
 node {
 	download = true

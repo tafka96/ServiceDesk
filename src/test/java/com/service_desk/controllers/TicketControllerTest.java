@@ -42,12 +42,12 @@ class TicketControllerTest {
     public void getTicketByIdTest() throws Exception {
         when(ticketService.getTicketById(1)).thenReturn(mockTicket1);
         when(ticketService.getTicketById(2)).thenReturn(mockTicket2);
-        mockMvc.perform(get("/tickets/1").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/tickets/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(mockTicket1.getId())))
                 .andExpect(jsonPath("$.email", is(mockTicket1.getEmail())));
 
-        mockMvc.perform(get("/tickets/2").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/tickets/2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(mockTicket2.getId())))
                 .andExpect(jsonPath("$.email", is(mockTicket2.getEmail())));
@@ -58,7 +58,7 @@ class TicketControllerTest {
     @Test
     public void getAllTicketsTest() throws Exception {
         when(ticketService.getAllOpenTickets()).thenReturn(Arrays.asList(mockTicket1, mockTicket2));
-        mockMvc.perform(get("/tickets").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/tickets").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(mockTicket1.getId())))
@@ -78,7 +78,7 @@ class TicketControllerTest {
         });
 
         Ticket ticket = getMockAddTicket();
-        mockMvc.perform(post("/tickets/add").content(objectMapper.writeValueAsString(ticket)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/tickets/add").content(objectMapper.writeValueAsString(ticket)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(13)))
                 .andExpect(jsonPath("$.title", is(getMockAddTicket().getTitle())))
@@ -90,7 +90,7 @@ class TicketControllerTest {
     @Test
     public void updateTicketTest() throws Exception{
         when(ticketService.updateTicket(any(Ticket.class))).thenReturn(mockTicket1);
-        mockMvc.perform(post("/tickets/update").content(objectMapper.writeValueAsString(mockTicket1)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/tickets/update").content(objectMapper.writeValueAsString(mockTicket1)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(mockTicket1.getId())))
                 .andExpect(jsonPath("$.problem", is(mockTicket1.getProblem())));
@@ -99,7 +99,7 @@ class TicketControllerTest {
 
     @Test
     public void addTicketValidationTest() throws Exception {
-        mockMvc.perform(post("/tickets/add").content(objectMapper.writeValueAsString(failValidationTicket)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/tickets/add").content(objectMapper.writeValueAsString(failValidationTicket)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.errors", Matchers.containsInAnyOrder("Title must be between 3 and 50 letters","Please enter a correct email")));
@@ -109,7 +109,7 @@ class TicketControllerTest {
 
     @Test
     public void updateTicketValidationTest() throws Exception {
-        mockMvc.perform(post("/tickets/update").content(objectMapper.writeValueAsString(failValidationTicket)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/api/tickets/update").content(objectMapper.writeValueAsString(failValidationTicket)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.errors", Matchers.containsInAnyOrder("Title must be between 3 and 50 letters","Please enter a correct email")));
