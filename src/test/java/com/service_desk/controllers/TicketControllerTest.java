@@ -113,10 +113,31 @@ class TicketControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.errors", Matchers.containsInAnyOrder("Title must be between 3 and 50 letters","Please enter a correct email")));
-
-
         verify(ticketService, times(0)).updateTicket(any(Ticket.class));
     }
+
+    @Test
+    public void closeTicketTest() throws Exception{
+        mockTicket1.setClosed(true);
+        when(ticketService.closeTicket(any())).thenReturn(mockTicket1);
+        mockMvc.perform(get("/api/tickets/close/1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(mockTicket1.getId())))
+                .andExpect(jsonPath("$.problem", is(mockTicket1.getProblem())))
+                .andExpect(jsonPath("$.closed", is(true)));
+        verify(ticketService, times(1)).closeTicket(any());
+    }
+
+    @Test
+    public void getPrioritiesTest() throws Exception{
+        mockMvc.perform(get("/api/priorities").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.hasSize(Ticket.Priority.values().length)));
+
+    }
+
+
+
 
     private final Ticket mockTicket1 = new Ticket(1, "Test title 1", "Testemail1@test.com", "Test problem 1", Ticket.Priority.AVERAGE,false, LocalDate.now(), null);
     private final Ticket mockTicket2 = new Ticket(2, "Test title 2", "Testemail2@test.com", "Test problem 2", Ticket.Priority.HIGH,false, LocalDate.now(), null);

@@ -66,6 +66,18 @@ class TicketRepositoryTest {
      assertNotNull(ticket.getId());
     }
 
+    @Test
+    @Transactional
+    public void closeTest(){
+        Integer id = 1;
+        Ticket ticket = ticketRepository.findById(id);
+        assertFalse(ticket.getClosed());
+        ticketRepository.close(id);
+        assertTrue(ticket.getClosed());
+        ticket = ticketRepository.findById(id);
+        assertTrue(ticket.getClosed());
+    }
+
 
     private Ticket getMockAddTicket(){
         Ticket ticket = new Ticket();
