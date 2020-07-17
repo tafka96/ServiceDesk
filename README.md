@@ -1,5 +1,5 @@
 # ServiceDesk
-
+A simple service tesk application. The backend is done with Java and Spring Boot, with H2 database. The front end is in React.
 
 ## Run Application on Development server
 
