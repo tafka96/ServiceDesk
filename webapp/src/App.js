@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Sidebar from "./components/sidebar";
-import { Route, HashRouter, Redirect} from 'react-router-dom'
+import { Route, HashRouter} from 'react-router-dom'
 import './App.css';
 import TicketDetails from "./components/ticketDetails";
 import AddTicket from "./components/addTicket";
