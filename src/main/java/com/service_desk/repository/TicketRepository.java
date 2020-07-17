@@ -22,10 +22,8 @@ public class TicketRepository {
 
     @Transactional
     public Ticket save(Ticket ticket){
-//        ticket.setClosed(false);
         entityManager.persist(ticket);
         return ticket;
-//        return ticket;
     }
     @Transactional
     public Ticket update(Ticket  ticket){
@@ -43,7 +41,6 @@ public class TicketRepository {
 
 
     public Ticket findById(Integer id){
-        Ticket ticket = entityManager.find(Ticket.class, id);
         return entityManager.find(Ticket.class, id);
     }
 }

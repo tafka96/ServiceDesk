@@ -25,9 +25,11 @@ public class Ticket {
 
     @Email(regexp = ".+@.+\\..+", message = "Please enter a correct email")
     @NotNull(message = "Please enter a correct email")
+    @Size(max = 100, message = "Email must be at most 100 letters")
     private String email;
 
     @Size(min = 3, message = "Problem description must be at least 3 letters")
+    @Size(max = 1000, message = "Problem description must be most 1000 letters")
     @Column(name = "problem")
     private String problem;
 
