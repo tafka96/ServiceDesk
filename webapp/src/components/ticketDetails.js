@@ -36,7 +36,11 @@ export default class TicketDetails extends React.Component{
         fetch(`/api/tickets/${new_id}`, {mode:"same-origin"})
             .then(res=> res.json())
             .then((data) => {
-                this.setState({ticket:data, loading: false, successMessage:this.props.location.message})
+                if (data.errors){
+                    this.setState({errors: data.errors, successMessage:'', loading: false, ticket:{}})
+                }else {
+                    this.setState({ticket:data, loading: false, successMessage:this.props.location.message})
+                }
             })
             .catch(() =>{
                 this.setState({loading: false, error:["Could not load ticket"]})
@@ -105,7 +109,7 @@ export default class TicketDetails extends React.Component{
         return (
             <div>
             <div className="ticket-form">
-                <form onSubmit={this.handleSubmit}>
+                <form hidden={!this.state.ticket.id} onSubmit={this.handleSubmit}>
                     <div className="form ticket-id"><h2>Ticket: {ticket.id}</h2></div>
                     <div className="form input ticket-title">Title: <input name="title" type="text" disabled={isClosed} size="50" value={ticket.title} onChange={this.handleInputChange}/></div>
                     <div className="form input ticket-email">Email: <input name="email" type="email" size="50" disabled={isClosed} value={ticket.email} onChange={this.handleInputChange}/></div>
