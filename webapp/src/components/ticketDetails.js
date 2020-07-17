@@ -39,11 +39,11 @@ export default class TicketDetails extends React.Component{
                 if (data.errors){
                     this.setState({errors: data.errors, successMessage:'', loading: false, ticket:{}})
                 }else {
-                    this.setState({ticket:data, loading: false, successMessage:this.props.location.message})
+                    this.setState({ticket:data, loading: false, successMessage:this.props.location.message, errors:[]})
                 }
             })
             .catch(() =>{
-                this.setState({loading: false, error:["Could not load ticket"]})
+                this.setState({loading: false, errors:["Could not load ticket"]})
             })
     }
 
@@ -84,7 +84,7 @@ export default class TicketDetails extends React.Component{
         fetch(`/api/tickets/close/${id}`, {mode:"same-origin"})
             .then(res=> res.json())
             .then((data) => {
-                this.setState({ticket:data, loading: false, successMessage: "Ticket closed"})
+                this.setState({ticket:data, loading: false, successMessage: "Ticket closed", errors:[]})
                 updateList()
             })
             .catch(() =>{
