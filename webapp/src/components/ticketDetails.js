@@ -76,7 +76,7 @@ export default class TicketDetails extends React.Component{
                     this.setState({errors: [], successMessage:"Details updated"})
                 }
             })
-            .catch(() => this.setState({errors : ["Failed to update ticket"]}))
+            .catch(() => this.setState({errors : ["Failed to update ticket"], successMessage: ''}))
     }
 
     closeTicket(){
@@ -88,7 +88,7 @@ export default class TicketDetails extends React.Component{
                 updateList()
             })
             .catch(() =>{
-                this.setState({loading: false, errors: ["Could not close ticket"]})
+                this.setState({loading: false, errors: ["Could not close ticket"], successMessage: ''})
             })
         updateList()
     }
