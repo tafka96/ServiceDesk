@@ -1,6 +1,6 @@
 # ServiceDesk
 A simple service tesk application. The backend is done with Java and Spring Boot, with H2 database. The front end is in React.
-
+To run the application Gradle, Java and Node are required.
 ## Run Application on Development server
 
 Run `gradlew bootrun` after cloning the repository. The first time setup might take a while to download all the neccessary node modules. 
