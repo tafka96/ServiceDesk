@@ -2,12 +2,14 @@ package com.service_desk.controllers;
 
 import com.service_desk.model.Ticket;
 import com.service_desk.services.TicketService;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +23,12 @@ public class TicketController {
     TicketService ticketService;
     
     @GetMapping(path = "/tickets/{id}")
-    public Ticket getTicket(@PathVariable(value = "id") Integer id){
-        return ticketService.getTicketById(id);
+    public Ticket getTicket(@PathVariable(value = "id") Integer id,  HttpServletResponse response){
+        Ticket ticket = ticketService.getTicketById(id);
+        if (ticket == null) {
+            throw new ObjectNotFoundException(id, "");
+        }
+        return ticket;
     }
 
     @GetMapping(path = "/tickets")
@@ -60,5 +66,13 @@ public class TicketController {
         }
         return errors;
     }
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public Map<String, List<String>> handleObjectNotFoundExceptions(ObjectNotFoundException ex){
+        Map<String, List<String>> errors = new HashMap<>();
+        errors.put("errors", List.of("No ticket found for id:" +ex.getIdentifier()));
+        return errors;
+    }
+
 
 }

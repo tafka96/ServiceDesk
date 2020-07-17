@@ -43,6 +43,7 @@ public class TicketRepository {
 
 
     public Ticket findById(Integer id){
+        Ticket ticket = entityManager.find(Ticket.class, id);
         return entityManager.find(Ticket.class, id);
     }
 }

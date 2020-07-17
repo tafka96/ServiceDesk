@@ -11,25 +11,29 @@ import java.time.LocalDate;
         @NamedQuery(name = "Ticket.FindAllOpen", query = "SELECT t FROM Ticket t WHERE t.closed=false")})
 public class Ticket {
     public enum Priority{
-        LOWEST, LOW, AVERAGE,  HIGH, HIGHEST;
+        LOWEST, LOW, AVERAGE,  HIGH, HIGHEST
     }
     @Size(min= 3, max = 50, message = "Title must be between 3 and 50 letters")
     @NotNull(message = "Title must be between 3 and 50 letters")
+    @Column(name = "title")
     private String title;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
     @Email(regexp = ".+@.+\\..+", message = "Please enter a correct email")
     @NotNull(message = "Please enter a correct email")
     private String email;
 
-    @NotNull(message = "Problem description cannot be empty")
+    @Size(min = 3, message = "Problem description must be at least 3 letters")
+    @Column(name = "problem")
     private String problem;
 
     @Enumerated(EnumType.ORDINAL)
     @NotNull(message = "Please set problem priority")
+    @Column(name = "priority")
     private Priority priority;
 
     @Column(name = "closed")
