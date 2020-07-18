@@ -4,7 +4,7 @@ To run the application Gradle, Java and Node are required.
 ## Run Application on Development server
 
 Run `gradlew bootrun` after cloning the repository. The first time setup might take a while to download all the neccessary node modules. 
-After that the application can be accessed at `http://localhost:8080/`.
+When the executing is at 88% the application is ready. After that the application can be accessed at `http://localhost:8080/`.
 
 ## Running unit tests
 Backend unit tests:
