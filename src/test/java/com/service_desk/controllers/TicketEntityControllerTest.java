@@ -57,26 +57,6 @@ class TicketEntityControllerTest {
 
         verify(ticketService, times(2)).getTicketById(anyLong());
     }
-    private final TicketResponse mockTicket1 = TicketResponse
-            .builder()
-            .id(1L)
-            .title("Test title 1")
-            .problem("Test problem 1")
-            .priority(TicketPriority.AVERAGE.toString())
-            .closed(false)
-            .createdDate(LocalDate.now())
-            .closedDate(null).build();
-    private final TicketResponse mockTicket2 = TicketResponse
-            .builder()
-            .id(2L)
-            .title("Test title 2")
-            .problem("Test problem 2")
-            .priority(TicketPriority.HIGH.toString())
-            .closed(false)
-            .createdDate(LocalDate.now())
-            .closedDate(null).build();
-
-
 
     @Test
     void getAllTicketsTest() throws Exception {
@@ -158,4 +138,25 @@ class TicketEntityControllerTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(TicketPriority.values().length)));
 
     }
+
+
+    private final TicketResponse mockTicket1 = TicketResponse
+            .builder()
+            .id(1L)
+            .title("Test title 1")
+            .problem("Test problem 1")
+            .priority(TicketPriority.AVERAGE.toString())
+            .closed(false)
+            .createdDate(LocalDate.now())
+            .closedDate(null).build();
+    private final TicketResponse mockTicket2 = TicketResponse
+            .builder()
+            .id(2L)
+            .title("Test title 2")
+            .problem("Test problem 2")
+            .priority(TicketPriority.HIGH.toString())
+            .closed(false)
+            .createdDate(LocalDate.now())
+            .closedDate(null).build();
+
 }

@@ -54,7 +54,7 @@ public class TicketController {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class)  //Could be replaced with ControllerAdvice, if me have many controllers
     public Map<String, List<String>> handleValidationExceptions(MethodArgumentNotValidException ex){
         var errorMessageList = ex.getBindingResult().getAllErrors()
                 .stream()
