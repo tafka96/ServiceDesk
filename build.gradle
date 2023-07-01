@@ -32,32 +32,4 @@ test {
 		events "passed", "skipped", "failed"
 	}
 	useJUnitPlatform()
-
-}
-
-task copyWebApp(type: Copy) {
-	from 'webapp/build'
-	into 'build/resources/main/static/.'
-}
-
-task appNpmInstall(type: NpmTask) {
-	description = "Installs all dependencies from package.json"
-	workingDir = file("${project.projectDir}/webapp")
-	args = ["install"]
-}
-task appNpmBuild(type: NpmTask) {
-	description = "Builds production version of the webapp"
-	workingDir = file("${project.projectDir}/webapp")
-	args = ["run", "build"]
-}
-
-
-appNpmBuild.dependsOn appNpmInstall
-copyWebApp.dependsOn appNpmBuild
-bootRun.dependsOn copyWebApp
-
-node {
-	download = true
-	workDir = file("${project.buildDir}/nodejs")
-	npmWorkDir = file("${project.buildDir}/npm")
 }
