@@ -1,9 +1,9 @@
 package com.service_desk.model;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.hibernate.validator.constraints.Email;
 
 @Data
 public class AddTicketRequest {

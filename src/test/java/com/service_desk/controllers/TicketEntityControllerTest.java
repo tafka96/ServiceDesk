@@ -42,7 +42,7 @@ class TicketEntityControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void getTicketByIdTest() throws Exception {
+    void getTicketByIdTest() throws Exception {
         when(ticketService.getTicketById(1L)).thenReturn(mockTicket1);
         when(ticketService.getTicketById(2L)).thenReturn(mockTicket2);
         mockMvc.perform(get("/api/tickets/1").contentType(MediaType.APPLICATION_JSON))
@@ -79,7 +79,7 @@ class TicketEntityControllerTest {
 
 
     @Test
-    public void getAllTicketsTest() throws Exception {
+    void getAllTicketsTest() throws Exception {
         when(ticketService.getAllOpenTickets()).thenReturn(Arrays.asList(mockTicket1, mockTicket2));
         mockMvc.perform(get("/api/tickets").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -92,7 +92,7 @@ class TicketEntityControllerTest {
     }
 
     @Test
-    public void updateTicketTest() throws Exception{
+    void updateTicketTest() throws Exception{
         var request = new UpdateTicketRequest();
         request.setId(1L);
         request.setProblem("Test problem");
@@ -109,7 +109,7 @@ class TicketEntityControllerTest {
     }
 
     @Test
-    public void addTicketValidationTest() throws Exception {
+    void addTicketValidationTest() throws Exception {
         var request = new AddTicketRequest();
         request.setTitle("Test title 1, Test title 1, Test titddddddddddle 1, Test title 1");
         request.setEmail("Testemail@testcom");
@@ -126,7 +126,7 @@ class TicketEntityControllerTest {
 
 
     @Test
-    public void updateTicketValidationTest() throws Exception {
+    void updateTicketValidationTest() throws Exception {
         var request = new UpdateTicketRequest();
         request.setId(1L);
         request.setProblem("Test problem");
@@ -142,7 +142,7 @@ class TicketEntityControllerTest {
     }
 
     @Test
-    public void closeTicketTest() throws Exception{
+    void closeTicketTest() throws Exception{
         when(ticketService.closeTicket(1L)).thenReturn(mockTicket1);
         mockMvc.perform(get("/api/tickets/close/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -152,7 +152,7 @@ class TicketEntityControllerTest {
     }
 
     @Test
-    public void getPrioritiesTest() throws Exception{
+    void getPrioritiesTest() throws Exception{
         mockMvc.perform(get("/api/tickets/priorities").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.hasSize(TicketPriority.values().length)));

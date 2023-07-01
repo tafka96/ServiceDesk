@@ -39,7 +39,7 @@ class TicketEntityServiceTest {
     TicketService ticketService;
 
     @Test
-    public void findByIdTest(){
+    void findByIdTest(){
         when(ticketMapper.map((TicketEntity) any())).thenCallRealMethod();
         when(ticketEntityRepository.findById(1L)).thenReturn(Optional.of(mockTicket1Entity));
         when(ticketEntityRepository.findById(2L)).thenReturn(Optional.of(mockTicket2Entity));
@@ -51,7 +51,7 @@ class TicketEntityServiceTest {
     }
 
     @Test
-    public void findByIdThrowsErrorWhenNotFoundTest(){
+    void findByIdThrowsErrorWhenNotFoundTest(){
         when(ticketEntityRepository.findById(4L)).thenReturn(Optional.empty());
         assertThrows(TicketNotFoundException.class, () -> ticketService.getTicketById(4L));
     }
@@ -59,7 +59,7 @@ class TicketEntityServiceTest {
 
 
     @Test
-    public void addTicketTest(){
+    void addTicketTest(){
         when(ticketEntityRepository.save(any())).thenReturn(mockTicket1Entity);
         var request = getAddTicketRequest();
         ticketService.addTicket(request);
@@ -82,7 +82,7 @@ class TicketEntityServiceTest {
     }
 
     @Test
-    public void getAllOpenTicketsTest(){
+    void getAllOpenTicketsTest(){
         List<TicketEntity> testList = Arrays.asList(mockTicket1Entity, mockTicket2Entity);
         when(ticketEntityRepository.findAllByClosedFalseOrderByPriorityDesc()).thenReturn(testList);
         assertEquals(ticketMapper.map(testList), ticketService.getAllOpenTickets());
@@ -90,7 +90,7 @@ class TicketEntityServiceTest {
 
 
     @Test
-    public void updateTicketThrowsErrorWhenNotFoundTest(){
+    void updateTicketThrowsErrorWhenNotFoundTest(){
         when(ticketEntityRepository.findById(4L)).thenReturn(Optional.empty());
         var request = new UpdateTicketRequest();
         request.setId(4L);
@@ -98,7 +98,7 @@ class TicketEntityServiceTest {
     }
 
     @Test
-    public void updateTicketTest(){
+    void updateTicketTest(){
         var request = new UpdateTicketRequest();
         request.setId(1L);
         request.setProblem("New problem");
@@ -120,7 +120,7 @@ class TicketEntityServiceTest {
     }
 
     @Test
-    public void closeTicketTest(){
+    void closeTicketTest(){
         when(ticketEntityRepository.findById(1L)).thenReturn(Optional.of(mockTicket1Entity));
         ticketService.closeTicket(1L);
         verify(ticketEntityRepository).save(ticketEntityArgumentCaptor.capture());
@@ -129,7 +129,7 @@ class TicketEntityServiceTest {
 
     }
     @Test
-    public void closeTicketThrowsErrorWhenNotFoundTest(){
+    void closeTicketThrowsErrorWhenNotFoundTest(){
         when(ticketEntityRepository.findById(4L)).thenReturn(Optional.empty());
         assertThrows(TicketNotFoundException.class, () -> ticketService.closeTicket(4L));
     }

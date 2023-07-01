@@ -25,7 +25,7 @@ class TicketEntityRepositoryTest {
 
 
     @Test
-    public void repositoryReturnsCorrectTicketTest(){
+    void repositoryReturnsCorrectTicketTest(){
         TicketEntity ticketEntity = ticketEntityRepository.findById(1L).get();
         assertEquals(1, ticketEntity.getId());
         assertEquals("Test Title 1", ticketEntity.getTitle());
@@ -35,7 +35,7 @@ class TicketEntityRepositoryTest {
     }
 
     @Test
-    public void getOpenTicketsReturnsOnlyOpenTickets(){
+    void getOpenTicketsReturnsOnlyOpenTickets(){
         TicketEntity closedTicketEntity = ticketEntityRepository.findById(5L).get();
         assertTrue(closedTicketEntity.getClosed());
         List<TicketEntity> ticketEntities = ticketEntityRepository.findAllByClosedFalseOrderByPriorityDesc();

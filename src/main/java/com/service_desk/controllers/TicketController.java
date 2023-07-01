@@ -8,13 +8,12 @@ import com.service_desk.model.UpdateTicketRequest;
 import com.service_desk.services.TicketService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +21,7 @@ import java.util.Map;
 @RequestMapping(path="/api/tickets")
 public class TicketController {
     @Autowired
-    TicketService ticketService;
+    private TicketService ticketService;
     
     @GetMapping(path = "/{id}")
     public TicketResponse getTicket(@PathVariable(value = "id") Long id){
@@ -57,19 +56,16 @@ public class TicketController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, List<String>> handleValidationExceptions(MethodArgumentNotValidException ex){
-        Map<String, List<String>> errors = new HashMap<>();
-        errors.put("errors", new ArrayList<>());
-        for (ObjectError error : ex.getBindingResult().getAllErrors()) {
-            errors.get("errors").add(error.getDefaultMessage());
-        }
-        return errors;
+        var errorMessageList = ex.getBindingResult().getAllErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .toList();
+        return Collections.singletonMap("errors", errorMessageList);
     }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(TicketNotFoundException.class)
     public Map<String, List<String>> handleObjectNotFoundExceptions(TicketNotFoundException ex){
-        Map<String, List<String>> errors = new HashMap<>();
-        errors.put("errors", List.of(ex.getMessage()));
-        return errors;
+        return Collections.singletonMap("errors", List.of(ex.getMessage()));
     }
 
 
