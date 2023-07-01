@@ -1,42 +1,69 @@
 package com.service_desk.services;
 
-import com.service_desk.model.Ticket;
-import com.service_desk.repository.TicketRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.service_desk.entity.TicketEntity;
+import com.service_desk.exceptions.TicketNotFoundException;
+import com.service_desk.model.AddTicketRequest;
+import com.service_desk.model.TicketResponse;
+import com.service_desk.model.UpdateTicketRequest;
+import com.service_desk.repository.TicketEntityRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TicketService {
-    @Autowired
-    TicketRepository ticketRepository;
 
-    public Ticket getTicketById(Integer id){
-        return ticketRepository.findById(id);
+    private final TicketEntityRepository ticketEntityRepository;
+    private final TicketMapper ticketMapper;
+
+
+    public TicketResponse getTicketById(Long id){
+        var ticketEntity = getTicketEntity(id);
+        return ticketMapper.map(ticketEntity);
     }
 
 
-    public Ticket addTicket(Ticket ticket){
-        ticket.setClosed(false);
-        ticket.setCreatedDate(LocalDate.now());
-        return ticketRepository.save(ticket);
+    public TicketResponse addTicket(AddTicketRequest request){
+        var ticketEntity = new TicketEntity();
+        ticketEntity.setPriority(request.getPriority());
+        ticketEntity.setTitle(request.getTitle());
+        ticketEntity.setEmail(request.getEmail());
+        ticketEntity.setProblem(request.getProblem());
+        ticketEntity.setClosed(false);
+        ticketEntity.setCreatedDate(LocalDate.now());
+        return ticketMapper.map(ticketEntityRepository.save(ticketEntity));
     }
 
-    public List<Ticket> getAllOpenTickets(){
-        List<Ticket> tickets =  ticketRepository.findAllOpenTickets();
-        tickets.sort(Comparator.comparing(Ticket::getPriority, Comparator.reverseOrder()));
-        return tickets;
+
+    public List<TicketResponse> getAllOpenTickets(){
+        List<TicketEntity> ticketEntities =  ticketEntityRepository.findAllByClosedFalseOrderByPriorityDesc();
+        return ticketMapper.map(ticketEntities);
     }
 
-    public Ticket updateTicket(Ticket ticket){
-        return ticketRepository.update(ticket);
+    public TicketResponse updateTicket(UpdateTicketRequest request){
+        var ticketEntity = getTicketEntity(request.getId());
+
+        ticketEntity.setProblem(request.getProblem());
+        ticketEntity.setTitle(request.getTitle());
+        ticketEntity.setEmail(request.getEmail());
+        ticketEntity.setPriority(request.getPriority());
+
+        return ticketMapper.map(ticketEntityRepository.save(ticketEntity));
     }
 
-    public Ticket closeTicket(Integer id){
-        return ticketRepository.close(id);
+    public TicketResponse closeTicket(Long id){
+        var ticket = getTicketEntity(id);
+
+        ticket.setClosed(true);
+        ticket.setClosedDate(LocalDate.now());
+        return ticketMapper.map(ticketEntityRepository.save(ticket));
     }
 
+    private TicketEntity getTicketEntity(Long id){
+        return ticketEntityRepository.findById(id)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket with id"+id+ " not found"));
+    }
 }

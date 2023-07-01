@@ -1,8 +1,11 @@
 package com.service_desk;
 
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -16,6 +19,9 @@ import java.util.Properties;
 
 @Configuration
 @Profile({"test"})
+@EnableJpaRepositories("com.service_desk.repository")
+@ComponentScan("com.service_desk.entity")
+@EntityScan("com.service_desk.entity")
 public class TestConfig {
 
     @Bean
@@ -34,7 +40,7 @@ public class TestConfig {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(getTestDataSource());
-        em.setPackagesToScan("com.service_desk.model");
+        em.setPackagesToScan("com.service_desk.entity");
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         Properties jpaProperties = new Properties();
