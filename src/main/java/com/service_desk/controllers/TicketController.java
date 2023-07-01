@@ -1,58 +1,56 @@
 package com.service_desk.controllers;
 
-import com.service_desk.model.Ticket;
+import com.service_desk.exceptions.TicketNotFoundException;
+import com.service_desk.model.AddTicketRequest;
+import com.service_desk.model.TicketPriority;
+import com.service_desk.model.TicketResponse;
+import com.service_desk.model.UpdateTicketRequest;
 import com.service_desk.services.TicketService;
-import org.hibernate.ObjectNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path="/api")
+@RequestMapping(path="/api/tickets")
 public class TicketController {
     @Autowired
     TicketService ticketService;
     
-    @GetMapping(path = "/tickets/{id}")
-    public Ticket getTicket(@PathVariable(value = "id") Integer id,  HttpServletResponse response){
-        Ticket ticket = ticketService.getTicketById(id);
-        if (ticket == null) {
-            throw new ObjectNotFoundException(id, "");
-        }
-        return ticket;
+    @GetMapping(path = "/{id}")
+    public TicketResponse getTicket(@PathVariable(value = "id") Long id){
+        return ticketService.getTicketById(id);
     }
 
-    @GetMapping(path = "/tickets")
-    public List<Ticket> getAllTickets(){
+    @GetMapping
+    public List<TicketResponse> getAllTickets(){
         return ticketService.getAllOpenTickets();
     }
 
-    @PostMapping(path = "/tickets/add")
-    public Ticket addTicket(@Valid @RequestBody Ticket ticket){
-        return ticketService.addTicket(ticket);
+    @PostMapping(path = "/add")
+    public TicketResponse addTicket(@Valid @RequestBody AddTicketRequest request){
+        return ticketService.addTicket(request);
     }
 
-    @PostMapping(path = "/tickets/update")
-    public Ticket updateTicket(@Valid @RequestBody Ticket ticket){
-        return ticketService.updateTicket(ticket);
+    @PostMapping(path = "/update")
+    public TicketResponse updateTicket(@Valid @RequestBody UpdateTicketRequest request){
+        return ticketService.updateTicket(request);
     }
 
     @GetMapping(path = "/priorities")
-    public Ticket.Priority[] getPriorities(){
-        return Ticket.Priority.values();
+    public TicketPriority[] getPriorities(){
+        return TicketPriority.values();
     }
 
-    @GetMapping(path = "tickets/close/{id}")
-    public Ticket closeTicket(@PathVariable(value = "id") Integer id){
+    @GetMapping(path = "/close/{id}")
+    public TicketResponse closeTicket(@PathVariable(value = "id") Long id){
         return ticketService.closeTicket(id);
     }
 
@@ -67,10 +65,10 @@ public class TicketController {
         return errors;
     }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ObjectNotFoundException.class)
-    public Map<String, List<String>> handleObjectNotFoundExceptions(ObjectNotFoundException ex){
+    @ExceptionHandler(TicketNotFoundException.class)
+    public Map<String, List<String>> handleObjectNotFoundExceptions(TicketNotFoundException ex){
         Map<String, List<String>> errors = new HashMap<>();
-        errors.put("errors", List.of("No ticket found for id:" +ex.getIdentifier()));
+        errors.put("errors", List.of(ex.getMessage()));
         return errors;
     }
 

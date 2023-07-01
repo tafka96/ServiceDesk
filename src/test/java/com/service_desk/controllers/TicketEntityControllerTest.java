@@ -1,7 +1,10 @@
 package com.service_desk.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.service_desk.model.Ticket;
+import com.service_desk.model.AddTicketRequest;
+import com.service_desk.model.TicketPriority;
+import com.service_desk.model.TicketResponse;
+import com.service_desk.model.UpdateTicketRequest;
 import com.service_desk.services.TicketService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -28,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = TicketController.class)
 @AutoConfigureMockMvc
-class TicketControllerTest {
+class TicketEntityControllerTest {
     @MockBean
     TicketService ticketService;
 
@@ -40,20 +43,40 @@ class TicketControllerTest {
 
     @Test
     public void getTicketByIdTest() throws Exception {
-        when(ticketService.getTicketById(1)).thenReturn(mockTicket1);
-        when(ticketService.getTicketById(2)).thenReturn(mockTicket2);
+        when(ticketService.getTicketById(1L)).thenReturn(mockTicket1);
+        when(ticketService.getTicketById(2L)).thenReturn(mockTicket2);
         mockMvc.perform(get("/api/tickets/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(mockTicket1.getId())))
+                .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.email", is(mockTicket1.getEmail())));
 
         mockMvc.perform(get("/api/tickets/2").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(mockTicket2.getId())))
+                .andExpect(jsonPath("$.id", is(2)))
                 .andExpect(jsonPath("$.email", is(mockTicket2.getEmail())));
 
-        verify(ticketService, times(2)).getTicketById(anyInt());
+        verify(ticketService, times(2)).getTicketById(anyLong());
     }
+    private final TicketResponse mockTicket1 = TicketResponse
+            .builder()
+            .id(1L)
+            .title("Test title 1")
+            .problem("Test problem 1")
+            .priority(TicketPriority.AVERAGE.toString())
+            .closed(false)
+            .createdDate(LocalDate.now())
+            .closedDate(null).build();
+    private final TicketResponse mockTicket2 = TicketResponse
+            .builder()
+            .id(2L)
+            .title("Test title 2")
+            .problem("Test problem 2")
+            .priority(TicketPriority.HIGH.toString())
+            .closed(false)
+            .createdDate(LocalDate.now())
+            .closedDate(null).build();
+
+
 
     @Test
     public void getAllTicketsTest() throws Exception {
@@ -61,93 +84,78 @@ class TicketControllerTest {
         mockMvc.perform(get("/api/tickets").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(mockTicket1.getId())))
+                .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].title", is(mockTicket1.getTitle())))
-                .andExpect(jsonPath("$[1].id", is(mockTicket2.getId())))
+                .andExpect(jsonPath("$[1].id", is(2)))
                 .andExpect(jsonPath("$[1].title", is(mockTicket2.getTitle())));
         verify(ticketService, times(1)).getAllOpenTickets();
     }
 
     @Test
-    public void addTicketTest() throws Exception{
-        when(ticketService.addTicket(any(Ticket.class))).thenAnswer(i -> {
-            Ticket returnTicket = getMockAddTicket();
-            returnTicket.setId(13);
-            returnTicket.setClosed(false);
-            return returnTicket;
-        });
-
-        Ticket ticket = getMockAddTicket();
-        mockMvc.perform(post("/api/tickets/add").content(objectMapper.writeValueAsString(ticket)).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(13)))
-                .andExpect(jsonPath("$.title", is(getMockAddTicket().getTitle())))
-                .andExpect(jsonPath("$.closed", is(false)));
-
-        verify(ticketService, times(1)).addTicket(any(Ticket.class));
-    }
-
-    @Test
     public void updateTicketTest() throws Exception{
-        when(ticketService.updateTicket(any(Ticket.class))).thenReturn(mockTicket1);
-        mockMvc.perform(post("/api/tickets/update").content(objectMapper.writeValueAsString(mockTicket1)).contentType(MediaType.APPLICATION_JSON))
+        var request = new UpdateTicketRequest();
+        request.setId(1L);
+        request.setProblem("Test problem");
+        request.setPriority(TicketPriority.HIGH);
+        request.setTitle("Test title");
+        request.setEmail("test@test.com");
+
+        when(ticketService.updateTicket(request)).thenReturn(mockTicket1);
+        mockMvc.perform(post("/api/tickets/update").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(mockTicket1.getId())))
+                .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.problem", is(mockTicket1.getProblem())));
-        verify(ticketService, times(1)).updateTicket(any(Ticket.class));
+        verify(ticketService, times(1)).updateTicket(any(UpdateTicketRequest.class));
     }
 
     @Test
     public void addTicketValidationTest() throws Exception {
-        mockMvc.perform(post("/api/tickets/add").content(objectMapper.writeValueAsString(failValidationTicket)).contentType(MediaType.APPLICATION_JSON))
+        var request = new AddTicketRequest();
+        request.setTitle("Test title 1, Test title 1, Test titddddddddddle 1, Test title 1");
+        request.setEmail("Testemail@testcom");
+        request.setProblem("Test problem 1");
+        request.setPriority(TicketPriority.AVERAGE);
+        mockMvc.perform(post("/api/tickets/add").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.errors", Matchers.containsInAnyOrder("Title must be between 3 and 50 letters","Please enter a correct email")));
 
-        verify(ticketService, times(0)).addTicket(any(Ticket.class));
+        verify(ticketService, times(0)).addTicket(any(AddTicketRequest.class));
     }
+
+
 
     @Test
     public void updateTicketValidationTest() throws Exception {
-        mockMvc.perform(post("/api/tickets/update").content(objectMapper.writeValueAsString(failValidationTicket)).contentType(MediaType.APPLICATION_JSON))
+        var request = new UpdateTicketRequest();
+        request.setId(1L);
+        request.setProblem("Test problem");
+        request.setPriority(TicketPriority.HIGH);
+        request.setTitle("Te");
+        request.setEmail("testtest.com");
+
+        mockMvc.perform(post("/api/tickets/update").content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.errors", Matchers.containsInAnyOrder("Title must be between 3 and 50 letters","Please enter a correct email")));
-        verify(ticketService, times(0)).updateTicket(any(Ticket.class));
+        verify(ticketService, times(0)).updateTicket(any(UpdateTicketRequest.class));
     }
 
     @Test
     public void closeTicketTest() throws Exception{
-        mockTicket1.setClosed(true);
-        when(ticketService.closeTicket(any())).thenReturn(mockTicket1);
+        when(ticketService.closeTicket(1L)).thenReturn(mockTicket1);
         mockMvc.perform(get("/api/tickets/close/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(mockTicket1.getId())))
-                .andExpect(jsonPath("$.problem", is(mockTicket1.getProblem())))
-                .andExpect(jsonPath("$.closed", is(true)));
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.problem", is(mockTicket1.getProblem())));
         verify(ticketService, times(1)).closeTicket(any());
     }
 
     @Test
     public void getPrioritiesTest() throws Exception{
-        mockMvc.perform(get("/api/priorities").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/tickets/priorities").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", Matchers.hasSize(Ticket.Priority.values().length)));
+                .andExpect(jsonPath("$", Matchers.hasSize(TicketPriority.values().length)));
 
-    }
-
-
-
-
-    private final Ticket mockTicket1 = new Ticket(1, "Test title 1", "Testemail1@test.com", "Test problem 1", Ticket.Priority.AVERAGE,false, LocalDate.now(), null);
-    private final Ticket mockTicket2 = new Ticket(2, "Test title 2", "Testemail2@test.com", "Test problem 2", Ticket.Priority.HIGH,false, LocalDate.now(), null);
-    private final Ticket failValidationTicket = new Ticket(1, "Test title 1, Test title 1, Test titddddddddddle 1, Test title 1", "Testemail@testcom", "Test problem 1", Ticket.Priority.AVERAGE,false , LocalDate.now(), null);
-    private Ticket getMockAddTicket(){
-        Ticket ticket = new Ticket();
-        ticket.setTitle("Test title 1");
-        ticket.setEmail("Testemail1@test.com");
-        ticket.setProblem("Test problem");
-        ticket.setPriority(Ticket.Priority.LOWEST);
-        return ticket;
     }
 }
