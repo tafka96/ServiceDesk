@@ -1,5 +1,6 @@
 package com.service_desk.controllers;
 
+import com.service_desk.exceptions.TicketClosedException;
 import com.service_desk.exceptions.TicketNotFoundException;
 import com.service_desk.model.AddTicketRequest;
 import com.service_desk.model.TicketPriority;
@@ -63,8 +64,14 @@ public class TicketController {
         return Collections.singletonMap("errors", errorMessageList);
     }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(TicketNotFoundException.class)
-    public Map<String, List<String>> handleObjectNotFoundExceptions(TicketNotFoundException ex){
+    @ExceptionHandler({TicketNotFoundException.class})
+    public Map<String, List<String>> handleTicketNotFoundExceptions(TicketNotFoundException ex){
+        return Collections.singletonMap("errors", List.of(ex.getMessage()));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TicketClosedException.class)
+    public Map<String, List<String>> handleTicketClosedExceptions(TicketClosedException ex){
         return Collections.singletonMap("errors", List.of(ex.getMessage()));
     }
 
