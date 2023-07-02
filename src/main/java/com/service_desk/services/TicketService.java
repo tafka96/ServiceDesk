@@ -1,6 +1,7 @@
 package com.service_desk.services;
 
 import com.service_desk.entity.TicketEntity;
+import com.service_desk.exceptions.TicketClosedException;
 import com.service_desk.exceptions.TicketNotFoundException;
 import com.service_desk.model.AddTicketRequest;
 import com.service_desk.model.TicketResponse;
@@ -45,6 +46,10 @@ public class TicketService {
 
     public TicketResponse updateTicket(UpdateTicketRequest request){
         var ticketEntity = getTicketEntity(request.getId());
+
+        if (ticketEntity.getClosed()){
+            throw new TicketClosedException("Ticket with Id " + request.getId() + " is already closed and cannot be updated");
+        }
 
         ticketEntity.setProblem(request.getProblem());
         ticketEntity.setTitle(request.getTitle());

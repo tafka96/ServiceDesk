@@ -1,6 +1,7 @@
 package com.service_desk.services;
 
 import com.service_desk.entity.TicketEntity;
+import com.service_desk.exceptions.TicketClosedException;
 import com.service_desk.exceptions.TicketNotFoundException;
 import com.service_desk.model.AddTicketRequest;
 import com.service_desk.model.TicketPriority;
@@ -98,6 +99,14 @@ class TicketEntityServiceTest {
     }
 
     @Test
+    void updateTicketThrowsErrorWhenClosedTest(){
+        when(ticketEntityRepository.findById(3L)).thenReturn(Optional.of(mockTicketClosedEntity));
+        var request = new UpdateTicketRequest();
+        request.setId(3L);
+        assertThrows(TicketClosedException.class, () -> ticketService.updateTicket(request));
+    }
+
+    @Test
     void updateTicketTest(){
         var request = new UpdateTicketRequest();
         request.setId(1L);
@@ -135,5 +144,8 @@ class TicketEntityServiceTest {
     }
     private final TicketEntity mockTicket1Entity = new TicketEntity(1L, "Test title 1", "Testemail1@test.com", "Test problem 1", TicketPriority.AVERAGE,false, LocalDate.now(), null);
     private final TicketEntity mockTicket2Entity = new TicketEntity(2L, "Test title 2", "Testemail2@test.com", "Test problem 2", TicketPriority.HIGH,false, LocalDate.now(), null);
+
+    private final TicketEntity mockTicketClosedEntity = new TicketEntity(3L , "Test title closed ticket", "Testemail3@test.com", "Test problem 3", TicketPriority.LOW,true, LocalDate.now(), LocalDate.now());
+
 }
 
